@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Ocene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background: #ffffff;
+            --card-background: #f8fafc;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="dark"] {
+            --background: #111827;
+            --card-background: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .average-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            border: none;
+        }
+
+        .average-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .recent-exams {
+            margin-top: 1rem;
+        }
+
+        .exam-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .exam-item:last-child {
+            border-bottom: none;
+        }
+
+        .grade-badge {
+            background: var(--success-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            min-width: 2rem;
+            text-align: center;
+        }
+
+        .grade-badge.low {
+            background: var(--warning-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-background);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .form {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--background);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .chart-container {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .chart {
+            height: 300px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            gap: 0.5rem;
+            padding: 2rem 0;
+        }
+
+        .chart-bar {
+            background: var(--primary-color);
+            border-radius: 0.25rem 0.25rem 0 0;
+            min-width: 40px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .chart-bar:hover {
+            background: var(--primary-hover);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            background: var(--success-color);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .alert.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            .table th,
+            .table td {
+                padding: 0.5rem;
+            }
+
+            .chart {
+                padding: 1rem 0;
+            }
+
+            .average-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    🎓 Moje Ocene
+                </div>
+                <div class="nav-buttons">
+                    <a href="#" class="nav-btn" onclick="showPage('dashboard')">📊 Dashboard</a>
+                    <a href="#" class="nav-btn" onclick="showPage('exams')">📚 Ispiti</a>
+                    <a href="#" class="nav-btn" onclick="showPage('statistics')">📈 Statistike</a>
+                    <a href="#" class="nav-btn" onclick="showPage('settings')">⚙️ Podešavanja</a>
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="dashboard">
+                <div class="card average-card">
+                    <h3>📊 Tvoj prosek</h3>
+                    <div class="average-number" id="averageDisplay">--.--</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="passedExams">0</div>
+                            <div>Položeni ispiti</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalECTS">0</div>
+                            <div>ECTS poeni</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>➕ Brze akcije</h3>
+                    <button class="btn" onclick="showAddExamModal()" style="width: 100%; margin-bottom: 1rem;">
+                        Dodaj novi ispit
+                    </button>
+                    <button class="btn btn-success" onclick="exportData()" style="width: 100%;">
+                        Izvezi podatke
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h3>📅 Poslednji ispiti</h3>
+                    <div class="recent-exams" id="recentExams">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📚</div>
+                            <p>Još uvek nema unetih ispita</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exams List Page -->
+        <div id="exams" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>📚 Lista ispita</h2>
+                <button class="btn" onclick="showAddExamModal()">➕ Dodaj ispit</button>
+            </div>
+
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>✅ Predmet</th>
+                            <th>📅 Datum</th>
+                            <th>🎓 Ocena</th>
+                            <th>📊 ESPB</th>
+                            <th>Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examsTable">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <div class="empty-state-icon">📚</div>
+                                <p>Nema unetih ispita</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Statistics Page -->
+        <div id="statistics" class="page">
+            <h2>📈 Statistike</h2>
+            
+            <div class="chart-container">
+                <h3>Prosek po mesecima</h3>
+                <div class="chart" id="monthlyChart">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Nema dovoljno podataka za grafikon</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h3>📊 Ukupna statistika</h3>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsAverage">--.--</div>
+                        <div>Prosečna ocena</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="averageProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>✅ Procenat položenih</h3>
+                    <div class="stat-item">
+                        <div class="stat-number" id="passPercentage">100%</div>
+                        <div>Uspešnost</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="passProgress" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎓 ECTS poeni</h3>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsECTS">0</div>
+                        <div>Ukupno poena</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ectsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <h2>⚙️ Podešavanja</h2>
+            
+            <div class="card">
+                <h3>🎨 Tema</h3>
+                <div class="form-group">
+                    <button class="btn" onclick="toggleTheme()">
+                        <span id="themeButtonText">Prebaci na tamnu temu</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💾 Podaci</h3>
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="exportData()">
+                        📄 Izvezi podatke (CSV)
+                    </button>
+                </div>
+                <div class="form-group">
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button class="btn" onclick="document.getElementById('importFile').click()">
+                        📥 Uvezi podatke
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        🗑️ Obriši sve podatke
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Exam Modal -->
+    <div id="examModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">➕ Dodaj novi ispit</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="examForm">
+                <div class="form-group">
+                    <label class="form-label" for="subjectName">Naziv predmeta *</label>
+                    <input type="text" id="subjectName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="professor">Profesor</label>
+                    <input type="text" id="professor" class="form-input">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="grade">Ocena (6-10) *</label>
+                        <select id="grade" class="form-select" required>
+                            <option value="">Izaberi ocenu</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="ects">ESPB poeni *</label>
+                        <input type="number" id="ects" class="form-input" min="1" max="30" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="examDate">Datum polaganja *</label>
+                    <input type="date" id="examDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notes">Beleške</label>
+                    <textarea id="notes" class="form-textarea" placeholder="Dodatne informacije o ispitu..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn" style="background: var(--text-secondary);" onclick="closeModal()">Otkaži</button>
+                    <button type="submit" class="btn">Sačuvaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Exam Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📖 Detalji predmeta</h3>
+                <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div id="examDetails"></div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                <button class="btn" onclick="editExam()">✏️ Izmeni</button>
+                <button class="btn btn-danger" onclick="deleteExam()">🗑️ Obriši</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let exams = [];
+        let currentExamId = null;
+        let editingExamId = null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateUI();
+            
+            // Set default date to today
+            document.getElementById('examDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Data management
+        function loadData() {
+            try {
+                const savedExams = JSON.parse(localStorage.getItem('mojeOcene') || '[]');
+                exams = savedExams.map(exam => ({
+                    ...exam,
+                    id: exam.id || Date.now() + Math.random()
+                }));
+            } catch (error) {
+                console.error('Error loading data:', error);
+                exams = [];
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('mojeOcene', JSON.stringify(exams));
+                updateUI();
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showAlert('Greška pri čuvanju podataka!', 'error');
+            }
+        }
+
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Theme management
+        function toggleTheme() {
+            const body = document.body;
+            const themeButton = document.getElementById('themeButtonText');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                if (themeButton) themeButton.textContent = 'Prebaci na tamnu temu';
+                document.querySelector('.theme-toggle').textContent = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                if (themeButton) themeButton.textContent = 'Prebaci na svetlu temu';
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+            
+            localStorage.setItem('theme', body.getAttribute('data-theme'));
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'dark') {
+                document.querySelector('.theme-toggle').textContent = '☀️';
+                const themeButton = document.getElementById('themeButtonText');
+                if (themeButton) themeButton.textContent = 'Prebaci na svetlu temu';
+            }
+        }
+
+        // Modal management
+        function showAddExamModal() {
+            document.getElementById('modalTitle').textContent = '➕ Dodaj novi ispit';
+            document.getElementById('examForm').reset();
+            document.getElementById('examDate').value = new Date().toISOString().split('T')[0];
+            editingExamId = null;
+            document.getElementById('examModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('examModal').classList.remove('active');
+            editingExamId = null;
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('active');
+            currentExamId = null;
+        }
+
+        function showExamDetails(examId) {
+            currentExamId = examId;
+            const exam = exams.find(e => e.id === examId);
+            if (!exam) return;
+
+            const detailsContainer = document.getElementById('examDetails');
+            detailsContainer.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">📚 Predmet:</span>
+                    <strong>${exam.subjectName}</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">👨‍🏫 Profesor:</span>
+                    ${exam.professor || 'Nije uneto'}
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">🎓 Ocena:</span>
+                    <span class="grade-badge ${exam.grade < 8 ? 'low' : ''}">${exam.grade}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📊 ESPB poeni:</span>
+                    ${exam.ects}
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Datum polaganja:</span>
+                    ${formatDate(exam.examDate)}
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📝 Beleške:</span>
+                    ${exam.notes || 'Nema beleški'}
+                </div>
+            `;
+            
+            document.getElementById('detailsModal').classList.add('active');
+        }
+
+        function editExam() {
+            if (!currentExamId) return;
+            
+            const exam = exams.find(e => e.id === currentExamId);
+            if (!exam) return;
+
+            // Fill form with exam data
+            document.getElementById('modalTitle').textContent = '✏️ Izmeni ispit';
+            document.getElementById('subjectName').value = exam.subjectName;
+            document.getElementById('professor').value = exam.professor || '';
+            document.getElementById('grade').value = exam.grade;
+            document.getElementById('ects').value = exam.ects;
+            document.getElementById('examDate').value = exam.examDate;
+            document.getElementById('notes').value = exam.notes || '';
+            
+            editingExamId = currentExamId;
+            closeDetailsModal();
+            document.getElementById('examModal').classList.add('active');
+        }
+
+        function editExamById(examId) {
+            currentExamId = examId;
+            editExam();
+        }
+
+        function deleteExam() {
+            if (!currentExamId) return;
+            
+            if (confirm('Da li ste sigurni da želite da obrišete ovaj ispit?')) {
+                exams = exams.filter(e => e.id !== currentExamId);
+                saveData();
+                closeDetailsModal();
+                showAlert('Ispit je uspešno obrisan!', 'success');
+            }
+        }
+
+        // Exam form handling
+        document.getElementById('examForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: editingExamId || Date.now() + Math.random(),
+                subjectName: document.getElementById('subjectName').value.trim(),
+                professor: document.getElementById('professor').value.trim(),
+                grade: parseInt(document.getElementById('grade').value),
+                ects: parseInt(document.getElementById('ects').value),
+                examDate: document.getElementById('examDate').value,
+                notes: document.getElementById('notes').value.trim()
+            };
+
+            if (editingExamId) {
+                const index = exams.findIndex(exam => exam.id === editingExamId);
+                if (index !== -1) {
+                    exams[index] = formData;
+                    showAlert('Ispit je uspešno ažuriran!', 'success');
+                }
+            } else {
+                exams.push(formData);
+                showAlert('Ispit je uspešno dodat!', 'success');
+            }
+
+            saveData();
+            closeModal();
+        });
+
+        // Calculations
+        function calculateAverage() {
+            if (exams.length === 0) return 0;
+            const weightedSum = exams.reduce((sum, exam) => sum + (exam.grade * exam.ects), 0);
+            const totalEcts = exams.reduce((sum, exam) => sum + exam.ects, 0);
+            return totalEcts > 0 ? weightedSum / totalEcts : 0;
+        }
+
+        function calculateMonthlyAverages() {
+            const monthlyData = {};
+            
+            exams.forEach(exam => {
+                const date = new Date(exam.examDate);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = {
+                        exams: [],
+                        totalGrades: 0,
+                        totalEcts: 0
+                    };
+                }
+                
+                monthlyData[monthKey].exams.push(exam);
+                monthlyData[monthKey].totalGrades += exam.grade * exam.ects;
+                monthlyData[monthKey].totalEcts += exam.ects;
+            });
+
+            return Object.entries(monthlyData)
+                .map(([month, data]) => ({
+                    month,
+                    average: data.totalEcts > 0 ? data.totalGrades / data.totalEcts : 0,
+                    count: data.exams.length
+                }))
+                .sort((a, b) => a.month.localeCompare(b.month));
+        }
+
+        // Update UI
+        function updateUI() {
+            updateDashboard();
+            updateExamsTable();
+            updateStatistics();
+        }
+
+        function updateDashboard() {
+            const average = calculateAverage();
+            const passedCount = exams.length;
+            const totalECTS = exams.reduce((sum, exam) => sum + exam.ects, 0);
+
+            document.getElementById('averageDisplay').textContent = average > 0 ? average.toFixed(2) : '--.--';
+            document.getElementById('passedExams').textContent = passedCount;
+            document.getElementById('totalECTS').textContent = totalECTS;
+
+            // Update recent exams
+            const recentExamsContainer = document.getElementById('recentExams');
+            if (exams.length === 0) {
+                recentExamsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📚</div>
+                        <p>Još uvek nema unetih ispita</p>
+                    </div>
+                `;
+            } else {
+                const recentExams = exams
+                    .sort((a, b) => new Date(b.examDate) - new Date(a.examDate))
+                    .slice(0, 5);
+
+                recentExamsContainer.innerHTML = recentExams.map(exam => `
+                    <div class="exam-item" onclick="showExamDetails(${exam.id})" style="cursor: pointer;">
+                        <div>
+                            <strong>${exam.subjectName}</strong>
+                            <br>
+                            <small style="color: var(--text-secondary);">${formatDate(exam.examDate)}</small>
+                        </div>
+                        <div class="grade-badge ${exam.grade < 8 ? 'low' : ''}">${exam.grade}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateExamsTable() {
+            const tableBody = document.getElementById('examsTable');
+            
+            if (exams.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div class="empty-state-icon">📚</div>
+                            <p>Nema unetih ispita</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sortedExams = exams.sort((a, b) => new Date(b.examDate) - new Date(a.examDate));
+            
+            tableBody.innerHTML = sortedExams.map(exam => `
+                <tr onclick="showExamDetails(${exam.id})" style="cursor: pointer;">
+                    <td>${exam.subjectName}</td>
+                    <td>${formatDate(exam.examDate)}</td>
+                    <td>
+                        <span class="grade-badge ${exam.grade < 8 ? 'low' : ''}">${exam.grade}</span>
+                    </td>
+                    <td>${exam.ects}</td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); editExamById(${exam.id})">✏️</button>
+                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;" onclick="event.stopPropagation(); deleteExamById(${exam.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStatistics() {
+            const average = calculateAverage();
+            const passedCount = exams.length;
+            const totalECTS = exams.reduce((sum, exam) => sum + exam.ects, 0);
+            const passPercentage = 100; // Assuming all exams in the system are passed
+
+            // Update statistics cards
+            document.getElementById('statsAverage').textContent = average > 0 ? average.toFixed(2) : '--.--';
+            document.getElementById('passPercentage').textContent = `${passPercentage}%`;
+            document.getElementById('statsECTS').textContent = totalECTS;
+
+            // Update progress bars
+            const avgProgress = average > 0 ? (average - 6) / 4 * 100 : 0; // Scale from 6-10 to 0-100%
+            document.getElementById('averageProgress').style.width = `${Math.min(avgProgress, 100)}%`;
+            document.getElementById('passProgress').style.width = `${passPercentage}%`;
+            document.getElementById('ectsProgress').style.width = `${Math.min(totalECTS / 240 * 100, 100)}%`; // Assuming 240 ECTS for degree
+
+            // Update monthly chart
+            updateMonthlyChart();
+        }
+
+        function updateMonthlyChart() {
+            const chartContainer = document.getElementById('monthlyChart');
+            const monthlyData = calculateMonthlyAverages();
+
+            if (monthlyData.length < 2) {
+                chartContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Nema dovoljno podataka za grafikon</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const maxAverage = Math.max(...monthlyData.map(d => d.average));
+            const minAverage = Math.min(...monthlyData.map(d => d.average));
+            const range = maxAverage - minAverage || 1;
+
+            chartContainer.innerHTML = monthlyData.map(data => {
+                const height = ((data.average - minAverage) / range) * 200 + 50; // Min 50px height
+                const monthName = new Date(data.month + '-01').toLocaleDateString('sr-RS', { 
+                    year: 'numeric', 
+                    month: 'short' 
+                });
+                
+                return `
+                    <div class="chart-bar" style="height: ${height}px;" title="${monthName}: ${data.average.toFixed(2)} (${data.count} ispita)">
+                        <div class="chart-value">${data.average.toFixed(1)}</div>
+                        <div class="chart-label">${monthName}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('sr-RS');
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+
+            // Show alert
+            setTimeout(() => alert.classList.add('show'), 100);
+
+            // Hide alert after 3 seconds
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => document.body.removeChild(alert), 300);
+            }, 3000);
+        }
+
+        function deleteExamById(examId) {
+            if (confirm('Da li ste sigurni da želite da obrišete ovaj ispit?')) {
+                exams = exams.filter(e => e.id !== examId);
+                saveData();
+                showAlert('Ispit je uspešno obrisan!', 'success');
+            }
+        }
+
+        // Data export/import functions
+        function exportData() {
+            if (exams.length === 0) {
+                showAlert('Nema podataka za izvoz!', 'error');
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['Predmet', 'Profesor', 'Ocena', 'ESPB', 'Datum', 'Beleške'];
+            const csvContent = [
+                headers.join(','),
+                ...exams.map(exam => [
+                    `"${exam.subjectName}"`,
+                    `"${exam.professor || ''}"`,
+                    exam.grade,
+                    exam.ects,
+                    exam.examDate,
+                    `"${exam.notes || ''}"`
+                ].join(','))
+            ].join('\n');
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `moje_ocene_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showAlert('Podaci su uspešno izvezeni!', 'success');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        if (confirm('Da li želite da zamenite postojeće podatke uvezenim podacima?')) {
+                            exams = importedData.map(exam => ({
+                                ...exam,
+                                id: exam.id || Date.now() + Math.random()
+                            }));
+                            saveData();
+                            showAlert('Podaci su uspešno uvezeni!', 'success');
+                        }
+                    } else {
+                        showAlert('Neispravna format datoteke!', 'error');
+                    }
+                } catch (error) {
+                    showAlert('Greška pri čitanju datoteke!', 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function clearAllData() {
+            if (confirm('Da li ste sigurni da želite da obrišete sve podatke? Ova akcija se ne može poništiti!')) {
+                if (confirm('Poslednje upozorenje: Svi vaši ispiti će biti obrisani!')) {
+                    exams = [];
+                    localStorage.removeItem('mojeOcene');
+                    updateUI();
+                    showAlert('Svi podaci su obrisani!', 'success');
+                }
+            }
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                if (e.target.id === 'examModal') closeModal();
+                if (e.target.id === 'detailsModal') closeDetailsModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDetailsModal();
+            }
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                showAddExamModal();
+            }
+        });
+    </script>
+</body>
+</html>
